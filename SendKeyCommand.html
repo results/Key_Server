@@ -1,0 +1,54 @@
+<?php
+	error_reporting(0);
+	
+	if(isset($_POST['function'])) {
+		if(!($sock = socket_create(AF_INET, SOCK_STREAM, 0))) {
+			$errorcode = socket_last_error();
+			$errormsg = socket_strerror($errorcode);
+			die("Unable to create socket - [Error Code $errorcode] \n");
+		}
+		//getting client ip (just because)
+	if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+	    $ip = $_SERVER['HTTP_CLIENT_IP'];
+	} elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+	    $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+	} else {
+	    $ip = $_SERVER['REMOTE_ADDR'];
+	}
+ 	//Connecting to server
+		if(!socket_connect($sock , '127.0.0.1' , 5555)) {
+			$errorcode = socket_last_error();
+			$errormsg = socket_strerror($errorcode);
+			die("Unable to connect to specified server - [Error Code $errorcode] \n");
+		}
+		if(!socket_send($sock , ($_POST['function'] . "\n" . (ucfirst($_POST['username']))), strlen(($_POST['function'] . " " . (ucfirst($_POST['username'])))) , 0)) {
+			$errorcode = socket_last_error();
+			$errormsg = socket_strerror($errorcode);
+			die("Unable to send data to specified server - [Error Code $errorcode] \n");
+		}
+		
+		echo "Key command: " . htmlentities(ucfirst($_POST['function'])) . " sent.";
+		
+	} else {
+		echo "Please issue a command.";
+	}
+?>
+<html>
+	<head>
+		<title>Send a key</title>
+	</head>
+	
+	<body>
+		<form method="POST" action="">
+		<br>
+			<table width="300px">
+				<tr>
+				<tr>
+					<td valign="top">
+						<input type="submit" value="Send Key" />
+					</td>
+				</tr>
+		</form>
+	</body>
+	
+</html>
